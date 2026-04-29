@@ -279,7 +279,7 @@
 
 <script>
 // ─── CONFIG ────────────────────────────────────────────────────────
-const API_URL = 'https://script.google.com/macros/s/AKfycbz4WjBhcXlkIKmw3dk8ATnBaBBkJOpmpBt0RM-RYCWF0dg07qsaCtN-k9zaeP70-L4C4w/exec'; // ← replace this after deploying
+const API_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL'; // ← replace this after deploying
 
 // ─── DEBT STRUCTURE ────────────────────────────────────────────────
 const DEBTS = {
@@ -295,6 +295,13 @@ const DEBTS = {
   ]
 };
 const AV = { Akak:'av-akak', Adik:'av-adik', Along:'av-along', Angah:'av-angah' };
+
+const ACCOUNTS = {
+  Along: { bank: 'Maybank',    number: '1530 1072 6235' },
+  Angah: { bank: 'BSN',        number: '0100 1411 0005 5074' },
+  Akak:  { bank: null,         number: null },
+  Adik:  { bank: 'Bank Islam', number: '121 400 2010 5047' },
+};
 
 // ─── STATE ─────────────────────────────────────────────────────────
 let payments = [];
@@ -341,9 +348,16 @@ function renderDashboard() {
       const done = rem === 0;
       const badgeCls = done ? 'badge-done' : paid > 0 ? 'badge-partial' : 'badge-none';
       const badgeTxt = done ? 'settled' : paid > 0 ? 'partial' : 'unpaid';
+      const acc = ACCOUNTS[d.to];
+      const accLine = acc && acc.number
+        ? `<div style="font-size:11px;color:var(--text3);margin-top:1px">${acc.bank} · ${acc.number}</div>`
+        : `<div style="font-size:11px;color:var(--text3);margin-top:1px">No account provided</div>`;
       return `<div class="debt-row">
         <div class="avatar av-sm ${d.av}">${d.to}</div>
-        <div class="debt-label">${d.to} <span class="badge ${badgeCls}">${badgeTxt}</span></div>
+        <div class="debt-label" style="flex-direction:column;align-items:flex-start;gap:1px">
+          <div style="display:flex;align-items:center;gap:6px">${d.to} <span class="badge ${badgeCls}">${badgeTxt}</span></div>
+          ${accLine}
+        </div>
         <div class="bar-wrap"><div class="bar"><div class="bar-fill ${done ? 'bar-done' : d.bar}" style="width:${pct}%"></div></div></div>
         <div class="debt-amounts">
           <div class="debt-paid-amt">${fmt(paid)}</div>
@@ -391,7 +405,13 @@ function updatePayeeOptions() {
   const sel   = document.getElementById('payee');
   if (!payer) { sel.innerHTML = '<option value="">Select payer first...</option>'; return; }
   sel.innerHTML = '<option value="">Select...</option>' +
-    DEBTS[payer].map(d => `<option value="${d.to}">${d.to}</option>`).join('');
+    DEBTS[payer].map(d => {
+      const acc = ACCOUNTS[d.to];
+      const label = acc && acc.number
+        ? `${d.to} — ${acc.bank} ${acc.number}`
+        : `${d.to} — (no account yet)`;
+      return `<option value="${d.to}">${label}</option>`;
+    }).join('');
 }
 
 // ─── FILE UPLOAD ───────────────────────────────────────────────────
