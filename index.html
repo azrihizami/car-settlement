@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Family Car Settlement</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg2: #f5f5f3;
+    --bg3: #eeede9;
+    --text: #1a1a18;
+    --text2: #6b6b67;
+    --text3: #9e9e99;
+    --border: rgba(0,0,0,0.1);
+    --border2: rgba(0,0,0,0.18);
+    --success: #3b6d11;
+    --success-bg: #eaf3de;
+    --danger: #a32d2d;
+    --danger-bg: #fcebeb;
+    --warning: #854f0b;
+    --warning-bg: #faeeda;
+    --info: #185fa5;
+    --info-bg: #e6f1fb;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1e1e1c;
+      --bg2: #2a2a27;
+      --bg3: #333330;
+      --text: #f0efeb;
+      --text2: #a8a8a2;
+      --text3: #6e6e68;
+      --border: rgba(255,255,255,0.1);
+      --border2: rgba(255,255,255,0.18);
+      --success: #97c459;
+      --success-bg: #1a2e08;
+      --danger: #f09595;
+      --danger-bg: #2e0f0f;
+      --warning: #ef9f27;
+      --warning-bg: #2d1e06;
+      --info: #85b7eb;
+      --info-bg: #081f38;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg3); color: var(--text); font-size: 15px; line-height: 1.5; min-height: 100vh; }
+  .container { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+  .header { margin-bottom: 1.5rem; }
+  .header h1 { font-size: 20px; font-weight: 600; color: var(--text); }
+  .header p { font-size: 13px; color: var(--text2); margin-top: 3px; }
+  .tabs { display: flex; background: var(--bg2); border-radius: var(--radius); padding: 4px; gap: 4px; margin-bottom: 1.25rem; }
+  .tab { flex: 1; font-size: 13px; padding: 7px 10px; cursor: pointer; border: none; background: transparent; color: var(--text2); border-radius: 6px; font-family: inherit; transition: background 0.15s, color 0.15s; }
+  .tab.active { background: var(--bg); color: var(--text); font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .section { display: none; }
+  .section.active { display: block; }
+  .metric-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.25rem; }
+  .metric { background: var(--bg2); border-radius: var(--radius); padding: 12px 14px; }
+  .metric-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .metric-value { font-size: 18px; font-weight: 600; color: var(--text); }
+  .metric-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .card-title { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+  .payer-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 0.5px solid var(--border); }
+  .avatar { border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; flex-shrink: 0; }
+  .av-lg { width: 38px; height: 38px; font-size: 12px; }
+  .av-sm { width: 28px; height: 28px; font-size: 11px; }
+  .av-akak  { background: #faeeda; color: #633806; }
+  .av-adik  { background: #eeedfe; color: #3c3489; }
+  .av-along { background: #e6f1fb; color: #0c447c; }
+  .av-angah { background: #eaf3de; color: #27500a; }
+  .payer-info { flex: 1; }
+  .payer-name { font-size: 15px; font-weight: 600; }
+  .payer-car  { font-size: 12px; color: var(--text2); }
+  .payer-right { text-align: right; }
+  .payer-remain { font-size: 14px; font-weight: 600; color: var(--danger); }
+  .payer-paid-lbl { font-size: 11px; color: var(--success); }
+  .debt-row { display: flex; align-items: center; gap: 8px; padding: 9px 0; border-bottom: 0.5px solid var(--border); }
+  .debt-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .debt-label { font-size: 13px; flex: 1; display: flex; align-items: center; gap: 6px; }
+  .badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 600; }
+  .badge-done    { background: var(--success-bg); color: var(--success); }
+  .badge-partial { background: var(--warning-bg); color: var(--warning); }
+  .badge-none    { background: var(--danger-bg);  color: var(--danger); }
+  .bar-wrap { width: 80px; flex-shrink: 0; }
+  .bar { height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 2px; }
+  .bar-akak { background: #ef9f27; }
+  .bar-adik { background: #7f77dd; }
+  .bar-done { background: #639922; }
+  .debt-amounts { text-align: right; min-width: 100px; }
+  .debt-paid-amt { font-size: 12px; font-weight: 600; color: var(--success); }
+  .debt-left-amt { font-size: 11px; color: var(--danger); }
+  .form-group { margin-bottom: 1rem; }
+  .form-label { font-size: 13px; color: var(--text2); display: block; margin-bottom: 5px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  select, input[type=text], input[type=number] {
+    width: 100%; background: var(--bg2); color: var(--text); border: 0.5px solid var(--border2);
+    border-radius: var(--radius); padding: 9px 12px; font-size: 14px; font-family: inherit;
+    outline: none; transition: border-color 0.15s;
+  }
+  select:focus, input:focus { border-color: var(--info); }
+  .upload-zone { border: 1.5px dashed var(--border2); border-radius: var(--radius); padding: 1.5rem; text-align: center; cursor: pointer; transition: background 0.15s; }
+  .upload-zone:hover { background: var(--bg2); }
+  .upload-zone p { font-size: 13px; color: var(--text2); }
+  .upload-zone span { font-size: 11px; color: var(--text3); }
+  .upload-preview { display: none; align-items: center; gap: 10px; padding: 9px 12px; background: var(--bg2); border-radius: var(--radius); margin-top: 8px; }
+  .upload-preview.show { display: flex; }
+  .preview-name { font-size: 13px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .btn-remove { font-size: 12px; color: var(--danger); cursor: pointer; border: none; background: transparent; font-family: inherit; }
+  .btn-submit { width: 100%; background: var(--text); color: var(--bg); border: none; padding: 11px; border-radius: var(--radius); font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; margin-top: 4px; transition: opacity 0.15s; }
+  .btn-submit:hover { opacity: 0.85; }
+  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .toast { display: none; padding: 11px 14px; border-radius: var(--radius); font-size: 13px; margin-bottom: 1rem; }
+  .toast.success { display: block; background: var(--success-bg); color: var(--success); border: 0.5px solid var(--success); }
+  .toast.error   { display: block; background: var(--danger-bg);  color: var(--danger);  border: 0.5px solid var(--danger); }
+  .hist-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 0.5px solid var(--border); }
+  .hist-row:last-child { border-bottom: none; }
+  .hist-info { flex: 1; }
+  .hist-main { font-size: 13px; font-weight: 500; }
+  .hist-meta { font-size: 11px; color: var(--text3); }
+  .hist-amount { font-size: 14px; font-weight: 600; color: var(--success); }
+  .receipt-link { font-size: 11px; color: var(--info); text-decoration: none; }
+  .receipt-link:hover { text-decoration: underline; }
+  .empty { font-size: 13px; color: var(--text2); padding: 8px 0; }
+  .spinner { display: none; width: 16px; height: 16px; border: 2px solid var(--bg3); border-top-color: var(--bg); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay { display: none; text-align: center; padding: 2rem; color: var(--text2); font-size: 13px; }
+  .loading-overlay.show { display: block; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+  .dot-ok  { background: var(--success); }
+  .dot-err { background: var(--danger); }
+  #api-status { font-size: 11px; color: var(--text3); text-align: right; margin-bottom: 8px; }
+  @media (max-width: 480px) {
+    .two-col { grid-template-columns: 1fr; }
+    .metric-row { grid-template-columns: 1fr 1fr; }
+    .metric-row .metric:last-child { grid-column: span 2; }
+    .bar-wrap { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Family car settlement</h1>
+    <p>Viva (RM 6,000) · Vios (RM 26,000) · Along, Angah, Akak, Adik</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('dashboard',this)">Dashboard</button>
+    <button class="tab" onclick="switchTab('submit',this)">Record payment</button>
+    <button class="tab" onclick="switchTab('history',this)">History</button>
+  </div>
+
+  <!-- ── DASHBOARD ── -->
+  <div id="dashboard" class="section active">
+    <div id="dash-loading" class="loading-overlay show">Loading...</div>
+    <div id="dash-content" style="display:none">
+      <div class="metric-row">
+        <div class="metric">
+          <div class="metric-label">Total due</div>
+          <div class="metric-value">RM 24,000</div>
+          <div class="metric-sub">Akak + Adik</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Paid so far</div>
+          <div class="metric-value" id="m-paid">RM 0</div>
+          <div class="metric-sub" id="m-pct">0% settled</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Remaining</div>
+          <div class="metric-value" id="m-remain" style="color:var(--danger)">RM 24,000</div>
+          <div class="metric-sub">outstanding</div>
+        </div>
+      </div>
+
+      <!-- Akak -->
+      <div class="card">
+        <div class="payer-header">
+          <div class="avatar av-lg av-akak">Akak</div>
+          <div class="payer-info">
+            <div class="payer-name">Akak</div>
+            <div class="payer-car">Took the Viva · to be paid 3 × RM 1,500</div>
+          </div>
+          <div class="payer-right">
+            <div class="payer-remain" id="akak-remain">RM 4,500 left</div>
+            <div class="payer-paid-lbl" id="akak-paid-lbl">RM 0 paid</div>
+          </div>
+        </div>
+        <div id="akak-debts"></div>
+      </div>
+
+      <!-- Adik -->
+      <div class="card">
+        <div class="payer-header">
+          <div class="avatar av-lg av-adik">Adik</div>
+          <div class="payer-info">
+            <div class="payer-name">Adik</div>
+            <div class="payer-car">Took the Vios · to be paid 3 × RM 6,500</div>
+          </div>
+          <div class="payer-right">
+            <div class="payer-remain" id="adik-remain">RM 19,500 left</div>
+            <div class="payer-paid-lbl" id="adik-paid-lbl">RM 0 paid</div>
+          </div>
+        </div>
+        <div id="adik-debts"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SUBMIT ── -->
+  <div id="submit" class="section">
+    <div id="submit-toast" class="toast"></div>
+    <div id="api-status"></div>
+
+    <div class="card">
+      <div class="card-title">Payment details</div>
+      <div class="two-col">
+        <div class="form-group">
+          <label class="form-label">Paid by</label>
+          <select id="payer" onchange="updatePayeeOptions()">
+            <option value="">Select...</option>
+            <option value="Akak">Akak</option>
+            <option value="Adik">Adik</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Paid to</label>
+          <select id="payee">
+            <option value="">Select payer first...</option>
+          </select>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="form-group">
+          <label class="form-label">Amount (RM)</label>
+          <input type="number" id="amount" placeholder="0.00" min="1" step="0.01" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date paid</label>
+          <input type="text" id="paydate" placeholder="DD/MM/YYYY" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reference / note (optional)</label>
+        <input type="text" id="ref" placeholder="e.g. IBG reference number" />
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Receipt (optional)</div>
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+        <p>Tap to upload receipt</p>
+        <span>PNG, JPG, PDF — max 5 MB</span>
+        <input type="file" id="fileInput" accept="image/*,.pdf" style="display:none" onchange="handleFile(this)" />
+      </div>
+      <div class="upload-preview" id="uploadPreview">
+        <span class="preview-name" id="previewName"></span>
+        <button class="btn-remove" onclick="removeFile()">Remove</button>
+      </div>
+    </div>
+
+    <button class="btn-submit" id="btn-submit" onclick="submitPayment()">Record payment</button>
+  </div>
+
+  <!-- ── HISTORY ── -->
+  <div id="history" class="section">
+    <div id="hist-loading" class="loading-overlay">Loading...</div>
+    <div class="card">
+      <div class="card-title">All payments</div>
+      <div id="hist-list"><div class="empty">No payments recorded yet.</div></div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+// ─── CONFIG ────────────────────────────────────────────────────────
+const API_URL = 'https://script.google.com/macros/s/AKfycbz4WjBhcXlkIKmw3dk8ATnBaBBkJOpmpBt0RM-RYCWF0dg07qsaCtN-k9zaeP70-L4C4w/exec'; // ← replace this after deploying
+
+// ─── DEBT STRUCTURE ────────────────────────────────────────────────
+const DEBTS = {
+  Akak: [
+    { to: 'Along', due: 1500, av: 'av-along', bar: 'bar-akak' },
+    { to: 'Angah', due: 1500, av: 'av-angah', bar: 'bar-akak' },
+    { to: 'Adik',  due: 1500, av: 'av-adik',  bar: 'bar-akak' },
+  ],
+  Adik: [
+    { to: 'Along', due: 6500, av: 'av-along', bar: 'bar-adik' },
+    { to: 'Angah', due: 6500, av: 'av-angah', bar: 'bar-adik' },
+    { to: 'Akak',  due: 6500, av: 'av-akak',  bar: 'bar-adik' },
+  ]
+};
+const AV = { Akak:'av-akak', Adik:'av-adik', Along:'av-along', Angah:'av-angah' };
+
+// ─── STATE ─────────────────────────────────────────────────────────
+let payments = [];
+
+// ─── UTILS ─────────────────────────────────────────────────────────
+function fmt(n) {
+  return 'RM ' + Number(n).toLocaleString('en-MY', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+function getPaid(payer, to) {
+  return payments.filter(p => p.payer === payer && p.payee === to).reduce((s, p) => s + Number(p.amount), 0);
+}
+function toBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+function today() {
+  return new Date().toLocaleDateString('en-GB');
+}
+
+// ─── RENDER DASHBOARD ──────────────────────────────────────────────
+function renderDashboard() {
+  const totalDue = 24000;
+  const totalPaid = payments.reduce((s, p) => s + Number(p.amount), 0);
+  const pct = Math.round(totalPaid / totalDue * 100);
+
+  document.getElementById('m-paid').textContent   = fmt(totalPaid);
+  document.getElementById('m-pct').textContent    = pct + '% settled';
+  document.getElementById('m-remain').textContent = fmt(totalDue - totalPaid);
+
+  ['Akak', 'Adik'].forEach(payer => {
+    const totalOwed = DEBTS[payer].reduce((s, d) => s + d.due, 0);
+    const paid = DEBTS[payer].reduce((s, d) => s + getPaid(payer, d.to), 0);
+    document.getElementById(payer.toLowerCase() + '-remain').textContent   = fmt(totalOwed - paid) + ' left';
+    document.getElementById(payer.toLowerCase() + '-paid-lbl').textContent = fmt(paid) + ' paid';
+
+    const html = DEBTS[payer].map(d => {
+      const paid = getPaid(payer, d.to);
+      const rem  = Math.max(0, d.due - paid);
+      const pct  = Math.min(100, Math.round(paid / d.due * 100));
+      const done = rem === 0;
+      const badgeCls = done ? 'badge-done' : paid > 0 ? 'badge-partial' : 'badge-none';
+      const badgeTxt = done ? 'settled' : paid > 0 ? 'partial' : 'unpaid';
+      return `<div class="debt-row">
+        <div class="avatar av-sm ${d.av}">${d.to}</div>
+        <div class="debt-label">${d.to} <span class="badge ${badgeCls}">${badgeTxt}</span></div>
+        <div class="bar-wrap"><div class="bar"><div class="bar-fill ${done ? 'bar-done' : d.bar}" style="width:${pct}%"></div></div></div>
+        <div class="debt-amounts">
+          <div class="debt-paid-amt">${fmt(paid)}</div>
+          <div class="debt-left-amt">${done ? '✓ done' : fmt(rem) + ' left'}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    document.getElementById(payer.toLowerCase() + '-debts').innerHTML = html;
+  });
+}
+
+// ─── RENDER HISTORY ────────────────────────────────────────────────
+function renderHistory() {
+  const list = document.getElementById('hist-list');
+  if (!payments.length) {
+    list.innerHTML = '<div class="empty">No payments recorded yet.</div>';
+    return;
+  }
+  list.innerHTML = [...payments].reverse().map(p => `
+    <div class="hist-row">
+      <div class="avatar av-sm ${AV[p.payer]}">${p.payer}</div>
+      <div class="hist-info">
+        <div class="hist-main">${p.payer} → ${p.payee}</div>
+        <div class="hist-meta">${p.date}${p.reference ? ' · ' + p.reference : ''}
+          ${p.receipt_url ? ` · <a class="receipt-link" href="${p.receipt_url}" target="_blank">view receipt</a>` : ''}
+        </div>
+      </div>
+      <div class="hist-amount">${fmt(p.amount)}</div>
+    </div>`).join('');
+}
+
+// ─── TAB SWITCHING ─────────────────────────────────────────────────
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(name).classList.add('active');
+  if (name === 'history') renderHistory();
+}
+
+// ─── PAYEE OPTIONS ─────────────────────────────────────────────────
+function updatePayeeOptions() {
+  const payer = document.getElementById('payer').value;
+  const sel   = document.getElementById('payee');
+  if (!payer) { sel.innerHTML = '<option value="">Select payer first...</option>'; return; }
+  sel.innerHTML = '<option value="">Select...</option>' +
+    DEBTS[payer].map(d => `<option value="${d.to}">${d.to}</option>`).join('');
+}
+
+// ─── FILE UPLOAD ───────────────────────────────────────────────────
+function handleFile(input) {
+  if (input.files && input.files[0]) {
+    document.getElementById('previewName').textContent = input.files[0].name;
+    document.getElementById('uploadPreview').classList.add('show');
+  }
+}
+function removeFile() {
+  document.getElementById('fileInput').value = '';
+  document.getElementById('uploadPreview').classList.remove('show');
+}
+
+// ─── SHOW TOAST ────────────────────────────────────────────────────
+function showToast(msg, type) {
+  const t = document.getElementById('submit-toast');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  setTimeout(() => { t.className = 'toast'; }, 4000);
+}
+
+// ─── SUBMIT PAYMENT ────────────────────────────────────────────────
+async function submitPayment() {
+  const payer  = document.getElementById('payer').value;
+  const payee  = document.getElementById('payee').value;
+  const amount = parseFloat(document.getElementById('amount').value);
+  const date   = document.getElementById('paydate').value || today();
+  const ref    = document.getElementById('ref').value.trim();
+  const file   = document.getElementById('fileInput').files[0];
+
+  if (!payer || !payee) { showToast('Please select who is paying and who is receiving.', 'error'); return; }
+  if (!amount || amount <= 0) { showToast('Please enter a valid amount.', 'error'); return; }
+
+  const debt = DEBTS[payer].find(d => d.to === payee);
+  const alreadyPaid = getPaid(payer, payee);
+  const remaining   = debt.due - alreadyPaid;
+  if (remaining <= 0) { showToast(`${payer} has already fully settled with ${payee}.`, 'error'); return; }
+  if (amount > remaining) { showToast(`Amount exceeds what is owed. Maximum: ${fmt(remaining)}.`, 'error'); return; }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  let receiptBase64 = '', receiptName = '', receiptMime = '';
+  if (file) {
+    receiptBase64 = await toBase64(file);
+    receiptName   = file.name;
+    receiptMime   = file.type;
+  }
+
+  const payload = { action: 'submitPayment', payer, payee, amount, date, reference: ref, receiptBase64, receiptName, receiptMime };
+
+  try {
+    const res  = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+    const data = await res.json();
+    if (data.success) {
+      payments.push({ payer, payee, amount, date, reference: ref, receipt_url: data.receiptUrl || '' });
+      renderDashboard();
+      showToast(`Recorded: ${payer} paid ${fmt(amount)} to ${payee}.`, 'success');
+      document.getElementById('payer').value  = '';
+      document.getElementById('payee').innerHTML = '<option value="">Select payer first...</option>';
+      document.getElementById('amount').value = '';
+      document.getElementById('ref').value    = '';
+      removeFile();
+    } else {
+      showToast('Error: ' + (data.error || 'Unknown error.'), 'error');
+    }
+  } catch (err) {
+    showToast('Could not reach the server. Check your connection.', 'error');
+    console.error(err);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Record payment';
+}
+
+// ─── LOAD DATA FROM GOOGLE SHEETS ──────────────────────────────────
+async function loadData() {
+  document.getElementById('dash-loading').classList.add('show');
+  document.getElementById('dash-content').style.display = 'none';
+
+  try {
+    const res  = await fetch(API_URL + '?action=getPayments');
+    const data = await res.json();
+    if (data.success) {
+      payments = data.payments;
+      renderDashboard();
+      document.getElementById('api-status').innerHTML =
+        '<span class="status-dot dot-ok"></span>Connected to Google Sheets';
+    }
+  } catch (err) {
+    console.warn('Could not load from API, running in offline mode.');
+    document.getElementById('api-status').innerHTML =
+      '<span class="status-dot dot-err"></span>Offline — changes will not be saved';
+    renderDashboard();
+  }
+
+  document.getElementById('dash-loading').classList.remove('show');
+  document.getElementById('dash-content').style.display = 'block';
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────
+document.getElementById('paydate').value = today();
+loadData();
+</script>
+</body>
+</html>
